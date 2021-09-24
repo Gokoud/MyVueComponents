@@ -1,0 +1,41 @@
+.flex {
+  display: flex;
+}
+
+.direction-column {
+  flex-direction: column;
+}
+
+.center-center {
+  justify-content: center;
+  align-items: center;
+}
+
+.around-center {
+  justify-content: space-around;
+  align-items: center;
+}
+
+.between-center {
+  justify-content: space-between;
+  align-items: center;
+}
+
+.end-center {
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.bottom-shadow {
+  box-shadow: 0px 6px 40px #ebebeb;
+}
+
+.font-dataform {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.font-ellipsis {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
