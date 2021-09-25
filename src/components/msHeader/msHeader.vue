@@ -20,15 +20,15 @@ export default {
 
 <style scoped>
 .header {
-  border-radius: 10px;
   border: 1px solid #eeeeee;
+  background-color: #1d1d1f;
+  color: #f5f5f7;
+  font-size: 14px;
 }
 .nav {
   height: 50px;
   width: 80px;
   border-radius: 10px;
-}
-.nav:hover {
-  box-shadow: inset 3px 1px 3px #ebebeb;
+  flex: 1;
 }
 </style>
