@@ -19,6 +19,11 @@ export default {
     return {
       active: 0,
     }
+  },
+  methods: {
+    rootClick() {
+      alert(`这个在 header 组件中的方法被触发了。`)
+    }
   }
 }
 </script>

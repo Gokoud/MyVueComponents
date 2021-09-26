@@ -1,9 +1,10 @@
 <template>
   <div id="app">
+    <ms-scroll :urlList="imgArr"></ms-scroll>
     <!-- 加入了keep-alive 之后，离开了组件之后，这个组件就会进入缓存区被缓存起来 -->
+    <!-- 动态组件比较适合多个组件数据较统一的时候使用。 -->
     <keep-alive>
-      <!-- 动态组件比较适合多个组件数据较统一的时候使用。 -->
-      <component :is="currentTabComponent" :list="list" :imgArr="imgArr"  class="tab"></component>
+      <component ref="msHeader" :is="currentTabComponent" :list="list" :urlList="imgArr"  class="tab"></component>
     </keep-alive>
     <div id="dynamic-component-demo" class="demo flex center-center">
       <button 
@@ -14,6 +15,7 @@
         >
       {{ tab }}
       </button>
+      <button class="tab-button" @click="refs">测试 refs</button>
     </div>
     <!-- 这里的 url 组件属性，它的作用域在组件里面，所以在引用组件的地方是无法使用 url 的 -->
     <!-- 只要组件中设置了 slot ，任何都能够渲染出来，包括 html -->
@@ -44,13 +46,17 @@
 import msHeader from '@/components/msHeader/msHeader'
 import msScroll from '@/components/msScroll/msScroll'
 import msArticle from '@/components/msArticle.vue'
-import learnSlot from '@/components/learnSlot.vue'
 export default {
   components: {
     msHeader,
     msScroll,
     msArticle,
-    learnSlot
+    // 动态加载组件
+    'learnSlot':function(resolve) {
+      setTimeout(() => {
+        require(['@/components/learnSlot.vue'], resolve)
+      }, 1000);
+    }
   },
   computed:{
     currentTabComponent(){
@@ -61,7 +67,7 @@ export default {
     return {
       dynamicSlotName:'footer',
       currentTab:'Header',
-      tabs:['Scroll','Header','Article'],
+      tabs:['Header','Article'],
       list: [
         {name: '首页'},
         {name: '个人中心'},
@@ -74,18 +80,28 @@ export default {
         {url: "https://artec.oss-cn-shenzhen.aliyuncs.com/nrnjc80uvodpp5l51r07.jpg"}
       ]
     }
-  }
+  },
+  mounted() {
+    
+  },
+  methods: {
+    // 测试触发 msHeader 组件中的 rootClick 方法
+    refs() {
+      this.$refs.msHeader.rootClick();
+    }
+  },
 }
 </script>
 <style>
 @import url('./assets/common/common.css');
 .tab-button.active {
-  background-color: rosybrown;
-  font-weight: bold;
+  background-color: #1f1f1d;
+  color: #f5f5d5;
 }
 .tab-button {
   border: 1px solid #1f1f1d;
   background-color: #fff;
   border-radius: 4px;
+  margin: 4px 5px;
 }
 </style>

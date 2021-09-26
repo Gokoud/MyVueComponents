@@ -17,12 +17,12 @@
 <script>
 export default {
   name: 'learnSlot',
-  props: {
-    url: {
-      type: String,
-      default: 'url'
-    }
-  },
+  // props: {
+  //   url: {
+  //     type: String,
+  //     default: 'url'
+  //   }
+  // },
   data() {
     return {
       user: {
@@ -33,3 +33,13 @@ export default {
   }
 }
 </script>
+<style scoped>
+#slot {
+  width: 98%;
+  margin: 5px auto;
+  padding: 10px;
+  box-sizing: border-box;
+  border-radius: 4px;
+  box-shadow: 0px 0px 5px #a3a3a3;
+}
+</style>

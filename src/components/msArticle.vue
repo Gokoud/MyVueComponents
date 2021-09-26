@@ -58,8 +58,8 @@ export default {
   border: 1px solid #1f1f1d;
 }
 .selected-post-container {
-  width: 500px;
-  border: 1px solid #1f1f1d;
+  width: 100%;
+  text-align: center;
 }
 .posts-sidebar {
   display: flex;
