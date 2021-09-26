@@ -14,21 +14,33 @@ export default {
       type: Array,
       value: []
     }
+  },
+  data() {
+    return {
+      active: 0,
+    }
   }
 }
 </script>
 
 <style scoped>
 .header {
-  border: 1px solid #eeeeee;
   background-color: #1d1d1f;
-  color: #f5f5f7;
-  font-size: 14px;
+  border: 1px solid #1d1d1f;
 }
 .nav {
+  flex: 1;
   height: 50px;
   width: 80px;
-  border-radius: 10px;
-  flex: 1;
+  color: #f5f5f7;
+  font-size: 14px;
+  transition: all 150ms ease-in;
+}
+.nav:hover {
+  color: #1d1d1f;
+  background-color: #f5f5f7;
+}
+.active {
+  box-shadow: inset 2px -1px 2px #ebebeb;
 }
 </style>
