@@ -1,14 +1,13 @@
 <template>
   <div id="swipe">
-    <div class="swipe" ref="swipe" :style="{ transform: `translate3d(${xAxis}px,0,0)`, transition: animateState ? `transform 1000ms ease-out` : '',}"
-      @transitionend="animationEnd">
+    <div class="swipe" ref="swipe" :style="{ transform: `translate3d(${xAxis}px,0,0)`, transition: animateState ? `transform 1000ms ease-out` : '',}" @transitionend="animationEnd">
     <!-- transitionend 事件是 css 动画结束的时候触发的 -->
       <div class="swipe-item-wrapper" v-for="(sItem, index) in currentList" :class="index === currentIndex ? 'current' :''" :key="index">
         <img :src="sItem.url" alt="" />
       </div>
     </div>
     <div class="mask">
-        <div class="indicate" v-for="(item, key) in urlList" :key="key" :class="key === actuallyIndex ? 'active' : ''"></div>
+        <div class="indicate" v-for="(item, key) in urlList" :key="key" :class="key === activeIndex ? 'active' : ''"></div>
     </div>
   </div>
 </template>
@@ -28,7 +27,7 @@ export default {
       ],
     },
     // 是否开启自动播放
-    openAutoPlay:{
+    autopaly:{
         type: Boolean,
         default: true
     },
@@ -41,91 +40,80 @@ export default {
   data() {
     return {
         currentList: [], // 组件中处理过后的数组
-        currentIndex: 0, // 处理后数组的索引
-        actuallyIndex: 0, // 实际展示的索引值
-        markSwipeWidth: 0,
-        itemWidth: 0, // 一个 item 的宽度
-        markItemCount: 0, // 记录 item 的数量
-        animateState: true, // 是否开启动画
-        xAxis: 0 // 当前滑动的距离
+        currentIndex: 0, // 处理后数组的索引，例如原本数组 [0,1,2] ,处理后[lastIndex,0,1,2,firstIndex]
+        currentCount: 0,
+        activeIndex: 0, // 用来指向[lastIndex,0,1,2,firstIndex] 中的 0,1,2
+        animateState: false, // 是否开启动画
+        xAxis: 0 ,// 当前滑动的距离
+        itemWidth: 0 // 一个item 的宽度
     };
   },
-  computed: {
-    // 是否可以滑动
-    isScroll() {
-        return this.markItemCount > 1
-    }
+  created() {
+    
   },
   mounted() {
       this.init();
   },
   methods: {
-      // 初始化页面
-      init() {
-          this.currentListFactory();
-          this.getItemWidth();
-          this.xAxis = this.calcScrollDistance();
-          this.openAutoPlay && this.autoPlay();
-          this.currentIndex = this.calcActuallyIndex(this.currentIndex);
-          this.markSwipeWidth = -(this.markItemCount - 1) * this.itemWidth
-      },
-      // 将 props 传进来的 urlList 处理成 currentList
-      currentListFactory() {
-          const propsUrlLength = this.urlList && this.urlList.length;
-          const currentUrlArr = JSON.parse(JSON.stringify(this.urlList));
-          if (propsUrlLength > 1) {
-              this.currentList = currentUrlArr.slice(-1).concat(currentUrlArr).concat(currentUrlArr.slice(0,1));
-          }
-          if (propsUrlLength === 1) {
-              this.currentList = currentUrlArr;
-          }
-          this.markItemCount = this.currentList.length;
-          this.currentIndex += 1;
-          this.$emit('change', this.actuallyIndex);
-      },
-      // 获取 item 的宽度
-      getItemWidth() {
-          this.itemWidth = this.$refs.swipe.getBoundingClientRect().width;
-      },
-      // 计算每次滑动的距离
-      calcScrollDistance() {
-          const distance = -this.currentIndex * this.itemWidth;
-          return distance;
-      },
-      // 自动播放
-      autoPlay() {
-          setTimeout(() => {
-              this.currentIndex += 1;
-              this.xAxis = this.calcScrollDistance();
-              this.currentIndex = this.checkIsFinallyIndex(this.currentIndex);
-              this.actuallyIndex = this.calcActuallyIndex(this.currentIndex) - 1;
-              this.animateState = true
-              this.autoPlay()
-          }, this.duration)
-      },
-      // 动画结束
-      animationEnd() {
-          // 动画结束就关闭动画
-          this.animateState = false;
-          this.currentIndex = this.calcActuallyIndex(this.currentIndex);
-          this.xAxis = this.calcScrollDistance()
-          
-          this.$emit('change', this.actuallyIndex);
-      },
-      // 计算实际展示索引值
-      calcActuallyIndex(index) {
-          if (index === 0) {
-              return this.markItemCount - 2
-          } else if (index === this.markItemCount - 1) {
-              return 1
-          } else {
-              return index
-          }
-      },
-      // 修正索引,判断有没有到最后一张轮播图
-      checkIsFinallyIndex(index){
-          return index > this.markItemCount - 1 ? this.markItemCount - 1 : index
+    init() {
+      this.animateState = true
+      this.processOriginalData()
+    },
+    // 处理原数组
+    processOriginalData() {
+      const originalDataLen = this.urlList.length
+      const originalData = JSON.parse(JSON.stringify(this.urlList))
+      if ( originalDataLen === 1) {
+        this.currentList = originalData
       }
+      // 将原数组 0 ，切一份放最后。将原数组最后一个切一份放第一个。
+      if ( originalDataLen > 1) {
+        this.currentList = originalData.slice(-1).concat(originalData).concat(originalData.slice(0,1))
+      }
+      this.currentCount = this.currentList.length
+      this.currentIndex += 1
+      this.activeIndex = this.currentIndex - 1
+      this.itemWidth = this.$refs.swipe.getBoundingClientRect().width
+      this.xAxis = this.clacDistance()
+      this.autopaly && this.autoPlay()
+    },
+    // 计算滑动的距离
+    clacDistance() {
+      return -this.currentIndex * this.itemWidth
+    },
+    // 自动播放
+    autoPlay(){
+      setTimeout(()=> {
+        this.currentIndex += 1
+        this.currentIndex = this.checkIndex(this.currentIndex)
+        this.activeIndex = this.getActiveIndex(this.currentIndex) - 1
+        this.xAxis = this.clacDistance()
+        this.animateState = true
+        this.autoPlay()
+      }, this.duration)
+    },
+    // 活动下标的索引
+    getActiveIndex (i) {
+      // 如果滑到了 currentIndex 的第 0 张，那么 currentIndex 就要指会倒数第二张
+      if (i === 0) {
+        return this.currentCount - 2
+        // 如果滑到了最后一张，那么currentIndex就要指向第1张
+      } else if (i === this.currentCount - 1) {
+        return 1
+      } else {
+        return i
+      }
+    },
+    // 检查当前索引值是否到最后了
+    checkIndex(i) {
+      return i > this.currentCount - 1 ? this.currentCount - 1 : i
+    },
+    // 动画结束
+    animationEnd() {
+      this.animateState = false
+      this.currentIndex = this.getActiveIndex(this.currentIndex)
+      this.xAxis = this.clacDistance()
+    }
   },
 };
 </script>
