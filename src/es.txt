@@ -1,0 +1,20 @@
+es 标准中的相等比较算法
+抽象相等（==）
+严格相等（===）
+SameValue(Object.is())
+SameValueZero(暂无)
+
+Object.is() 主要是用来判断两个值是否是同一个值，它与 === 的区别主要是以下两种情况
+
+Object.is(NaN, NaN) // true
+Object.is(0, -0)  // false
+
+SameValueZero 
+
+const = new Set()
+s.add(0)
+s.add(NaN)
+s.has(-0) // true
+s.has(NaN) // true
+
+tips: includes() 使用的也是 SameValueZero

@@ -1,8 +1,6 @@
 <template>
   <div id="swipe">
-    <div class="swipe" ref="swipe" 
-    :style="{ transform: `translate3d(${xAxis}px,0,0)`, transition: animateState ? `transform 1000ms ease-out` : '',}"
-    >
+    <div class="swipe" ref="swipe" :style="{ transform: `translate3d(${xAxis}px,0,0)`, transition: animateState ? `transform 1000ms ease-out` : '',}" @transitionend="animationEnd">
     <!-- transitionend 事件是 css 动画结束的时候触发的 -->
       <div class="swipe-item-wrapper" v-for="(sItem, index) in currentList" :class="index === currentIndex ? 'current' :''" :key="index">
         <img :src="sItem.url" alt="" />
@@ -29,7 +27,7 @@ export default {
       ],
     },
     // 是否开启自动播放
-    openAutoPlay:{
+    autopaly:{
         type: Boolean,
         default: true
     },
@@ -41,50 +39,86 @@ export default {
   },
   data() {
     return {
-        currentList: [], // 组件中处理过后的数组
-        currentIndex: 0, // 处理后数组的索引
-        activeIndex: 0, // 实际展示的索引值
-        xAxis: 0, // 当前滑动的距离
-        itemWidth: 0, // 一个 item 的宽度
-        itemCount: 0, // 记录 item 的数量
-        animateState: true // 是否开启动画
+      // 组件中处理过后的数组
+      currentList: [], 
+      // 处理后数组的索引，例如原本数组 [0,1,2] ,处理后[lastIndex,0,1,2,firstIndex]
+      currentIndex: 0,
+      currentCount: 0,
+      // 用来指向[lastIndex,0,1,2,firstIndex] 中的 0,1,2
+      activeIndex: 0, 
+      // 是否开启动画
+      animateState: false, 
+      // 当前滑动的距离
+      xAxis: 0 ,
+      // 一个item 的宽度
+      itemWidth: 0 
     };
   },
-  computed: {
-    // 是否可以滑动
-    isScroll() {
-        return this.itemCount > 1
-    }
-  },
-  created(){
-    const urlListLen = this.urlList.length;
-    if (urlListLen === 1) {
-      this.currentList = this.urlList
-    }
-    if (urlListLen > 1 ) {
-      this.currentList = this.urlList.slice(-1).concat(this.urlList).concat(this.urlList.slice(0,1))
-    }
-    this.itemCount = this.currentList.length;
-    // 在原本的列表前面加了一张，所以 currentIndex 往后推 [0,1,2]   [lastIndex,0,1,2,firstIndex]
-    this.currentIndex += 1
-    this.activeIndex = this.currentIndex - 1
+  created() {
+    
   },
   mounted() {
-      this.init();
+    this.init();
   },
   methods: {
     init() {
-      this.itemWidth = this.$refs.swipe.getBoundingClientRect().width;
-      this.currentIndex = 
-      this.xAxis = this.slideX()
+      this.animateState = true
+      this.processOriginalData()
     },
-    // 滑动距离
-    slideX(){
+    // 处理原数组
+    processOriginalData() {
+      const originalDataLen = this.urlList.length
+      const originalData = JSON.parse(JSON.stringify(this.urlList))
+      if ( originalDataLen === 1) {
+        this.currentList = originalData
+      }
+      // 将原数组 0 ，切一份放最后。将原数组最后一个切一份放第一个。
+      if ( originalDataLen > 1) {
+        this.currentList = originalData.slice(-1).concat(originalData).concat(originalData.slice(0,1))
+      }
+      this.currentCount = this.currentList.length
+      this.currentIndex += 1
+      this.activeIndex = this.currentIndex - 1
+      this.itemWidth = this.$refs.swipe.getBoundingClientRect().width
+      this.xAxis = this.clacDistance()
+      this.autopaly && this.autoPlay()
+    },
+    // 计算滑动的距离
+    clacDistance() {
       return -this.currentIndex * this.itemWidth
     },
-    // 判断 currentIndex 索引值是否正确
-    checkCurrentIndex(curIndex) {
-      
+    // 自动播放
+    autoPlay(){
+      setTimeout(()=> {
+        this.currentIndex += 1
+        this.currentIndex = this.checkIndex(this.currentIndex)
+        this.activeIndex = this.getActiveIndex(this.currentIndex) - 1
+        this.xAxis = this.clacDistance()
+        this.animateState = true
+        this.autoPlay()
+      }, this.duration)
+    },
+    // 活动下标的索引
+    getActiveIndex (i) {
+      // 如果滑到了 currentIndex 的第 0 张，那么 currentIndex 就要指会倒数第二张
+      if (i === 0) {
+        return this.currentCount - 2
+        // 如果滑到了最后一张，那么currentIndex就要指向第1张
+      } else if (i === this.currentCount - 1) {
+        return 1
+      } else {
+        return i
+      }
+    },
+    // 检查当前索引值是否到最后了
+    checkIndex(i) {
+      return i > this.currentCount - 1 ? this.currentCount - 1 : i
+    },
+    // 动画结束
+    animationEnd() {
+      this.animateState = false
+      this.currentIndex = this.getActiveIndex(this.currentIndex)
+      this.xAxis = this.clacDistance()
     }
   },
 };

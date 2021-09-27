@@ -30,6 +30,11 @@ export default {
         lastName: 'mausen'
       }
     }
+  },
+  mounted() {
+    // 使用 $attrs 获取过来的数据可以修改
+    this.$attrs.url = 'www.baidu.com'
+    console.log(this.$attrs)
   }
 }
 </script>

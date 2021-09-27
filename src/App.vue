@@ -19,7 +19,7 @@
     </div>
     <!-- 这里的 url 组件属性，它的作用域在组件里面，所以在引用组件的地方是无法使用 url 的 -->
     <!-- 只要组件中设置了 slot ，任何都能够渲染出来，包括 html -->
-    <learn-slot url="www.mausen.com">
+    <learn-slot url="www.mausen.com" slot-name="biu">
       <!-- v-slot 只能用在 template 标签上使用，v-slot 缩写 #,如果是默认插槽要带上 default -->
       <template #default>
         <!-- {{url}} 控制台会报错，因为 url 作用域在组件中 -->这是一个插槽
@@ -39,6 +39,10 @@
         {{user.lastName}}
       </template>
     </learn-slot>
+    <parent>
+        <son v-if="check" @test="test"></son>
+    </parent>
+    <button @click="check = !check">注册事件</button>
   </div>
 </template>
 
@@ -46,6 +50,8 @@
 import msHeader from '@/components/msHeader/msHeader'
 import msScroll from '@/components/msScroll/msScroll'
 import msArticle from '@/components/msArticle.vue'
+import Parent from '@/components/Parent.vue'
+import Son from '@/components/Son.vue'
 export default {
   components: {
     msHeader,
@@ -56,7 +62,9 @@ export default {
       setTimeout(() => {
         require(['@/components/learnSlot.vue'], resolve)
       }, 1000);
-    }
+    },
+    Parent,
+    Son
   },
   computed:{
     currentTabComponent(){
@@ -65,6 +73,8 @@ export default {
   },
   data() {
     return {
+      check: true,
+      rootVal: 0,
       dynamicSlotName:'footer',
       currentTab:'Header',
       tabs:['Header','Article'],
@@ -82,14 +92,21 @@ export default {
     }
   },
   mounted() {
-    
+    /**
+     * 获取根实例中的 foo,获取在 main.js 中的 Vue 实例数据，适合小项目
+     * 如果是大应用还是用 vuex 好了
+     */ 
+    this.rootVal = this.$root.foo
   },
   methods: {
     // 测试触发 msHeader 组件中的 rootClick 方法
     refs() {
       this.$refs.msHeader.rootClick();
+    },
+    test(e) {
+      console.log(`App.vue 触发的 test 事件${e}`)
     }
-  },
+  }
 }
 </script>
 <style>
