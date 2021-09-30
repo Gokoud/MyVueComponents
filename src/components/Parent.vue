@@ -32,7 +32,7 @@ export default {
   methods: {
     getDate() {
       const date = new Date()
-      return date.toLocaleString().replace()
+      console.log(date.toLocaleString().replace())
     }
   }
 }

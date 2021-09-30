@@ -18,3 +18,7 @@ s.has(-0) // true
 s.has(NaN) // true
 
 tips: includes() 使用的也是 SameValueZero
+
+const p1 = new Promise((resolve,reject)=>{})
+
+$emit, 

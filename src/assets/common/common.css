@@ -2,6 +2,17 @@
   display: flex;
 }
 
+button {
+  border: 1px solid;
+  border-radius: 4px;
+  background-color: rgb(104, 207, 255);
+}
+
+button:active {
+  background-color: #1d1d1f;
+  color: #ffffff;
+}
+
 .direction-column {
   flex-direction: column;
 }
@@ -38,4 +49,11 @@
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .5s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
 }

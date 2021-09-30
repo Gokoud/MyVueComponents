@@ -17,12 +17,6 @@
 <script>
 export default {
   name: 'learnSlot',
-  // props: {
-  //   url: {
-  //     type: String,
-  //     default: 'url'
-  //   }
-  // },
   data() {
     return {
       user: {
@@ -32,9 +26,33 @@ export default {
     }
   },
   mounted() {
-    // 使用 $attrs 获取过来的数据可以修改
+    // 如果在父作用域上写了不作为 prop 被识别的属性值时，我们可以通过下面的这个方法获取，并且是可修改的。
     this.$attrs.url = 'www.baidu.com'
-    console.log(this.$attrs)
+    this.attrsData();
+    this.normalSlots();
+    this.scopedSlots();
+    this.createScopedSlots();
+  },
+  methods: {
+    attrsData() {
+      // groupCollapsed 折叠分组，group 不折叠分组
+      console.groupCollapsed('%c使用 $attrs 获取传送过来的数据','color:#f00000;')
+      console.log(this.$attrs)
+      console.groupEnd()
+    },
+    normalSlots() {
+      console.groupCollapsed('%clearnSlot中的普通插槽','color:blue;')
+      console.log(this.$slots,'插槽')
+      console.groupEnd()
+    },
+    scopedSlots() {
+      console.groupCollapsed('%clearSlot 中的作用域插槽','color:green')
+      console.log(this.$scopedSlots,'所有的插槽无论是否带有作用域，都会暴露在 $scopedSlots 中，带有作用域的插槽，不会出现在 $slots 中')
+      console.groupEnd()
+    },
+    createScopedSlots() {
+      // 给 header 创建一个作用域
+    }
   }
 }
 </script>
